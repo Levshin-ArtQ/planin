@@ -1,0 +1,11 @@
+{
+  "name": "planin",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Planin: личный день на устройстве, без аккаунта",
+  "scripts": {
+    "start": "python3 -m http.server 8771",
+    "build": "node -e \"console.log('static PWA')\"",
+    "test": "node scripts/smoke-test.js"
+  }
+}
