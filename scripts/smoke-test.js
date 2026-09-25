@@ -37,7 +37,7 @@ ok("app does not fetch remote APIs", !/fetch\((['"])https?:/.test(app));
 ok("export and import", app.includes("exportJson") && app.includes("importAll") && html.includes('id="import-file"'));
 ok("gesture language is in the sheet", app.includes("влево и вниз") || app.includes("openDepth"));
 ok("work hours default live in settings flow", app.includes("workStartMin") && app.includes("toggle-rail"));
-ok("service worker cache", sw.includes("listok-v1.0.21") && sw.includes("./js/parse.js") && sw.includes("function isNav") && sw.includes("matchCache") && sw.includes("function precache") && !sw.includes("return cached || net") && !sw.includes("fetch(req)"));
+ok("service worker cache", sw.includes("listok-v1.0.22") && sw.includes("./js/parse.js") && sw.includes("function isNav") && sw.includes("res.redirected") && sw.includes("matchCache") && sw.includes("function precache") && !sw.includes("return cached || net") && !sw.includes("fetch(req)"));
 ok("double tap completes a habit", app.includes("function tapHabit"));
 ok("reorder grip", app.includes('class="grip"') && app.includes('data-group="plan"') && app.includes("fromGrip"));
 ok("double tap completes", app.includes("function tapTask"));

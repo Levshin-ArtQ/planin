@@ -1,4 +1,4 @@
-const CACHE = "listok-v1.0.21";
+const CACHE = "listok-v1.0.22";
 const ASSETS = [
   "./",
   "./index.html",
@@ -21,16 +21,28 @@ function isNav(req) {
   return accept.indexOf("text/html") !== -1;
 }
 
+async function settled(res) {
+  if (!res) return null;
+  if (!res.redirected && res.type !== "opaqueredirect") return res;
+  const buf = await res.arrayBuffer();
+  const headers = new Headers(res.headers);
+  headers.delete("content-encoding");
+  headers.delete("content-length");
+  headers.delete("location");
+  return new Response(buf, { status: 200, statusText: "OK", headers });
+}
+
 async function precache() {
   const cache = await caches.open(CACHE);
   await Promise.all(ASSETS.map(async (path) => {
     const abs = new URL(path, self.registration.scope);
     const res = await fetch(new Request(abs, { cache: "reload" }));
     if (!res || !res.ok) throw new Error("no " + path);
-    await cache.put(abs.href, res.clone());
+    const clean = await settled(res);
+    await cache.put(abs.href, clean.clone());
     if (path === "./" || path === "./index.html") {
-      await cache.put(self.registration.scope, res.clone());
-      await cache.put(new URL("./index.html", self.registration.scope).href, res.clone());
+      await cache.put(self.registration.scope, clean.clone());
+      await cache.put(new URL("./index.html", self.registration.scope).href, clean.clone());
     }
   }));
 }
@@ -91,18 +103,20 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
 
   event.respondWith((async () => {
-    const saved = await matchCache(req);
+    const saved = await settled(await matchCache(req));
     if (isNav(req)) {
       if (saved) return saved;
-      const shell = await matchCache(new Request(new URL("./index.html", self.registration.scope).href));
+      const shell = await settled(await matchCache(new Request(new URL("./index.html", self.registration.scope).href)));
       return shell || offlineShell();
     }
     if (saved) return saved;
     try {
       const net = await fetch(url.href);
       if (net && net.ok) {
+        const clean = await settled(net);
         const cache = await caches.open(CACHE);
-        await cache.put(url.href, net.clone());
+        await cache.put(url.href, clean.clone());
+        return clean;
       }
       return net;
     } catch (_) {
