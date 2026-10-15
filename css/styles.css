@@ -1,42 +1,101 @@
 :root {
+  /* R-28: токены движения — единственное место с миллисекундами и кривыми. */
+  --dur-0: 60ms;   /* отклик нажатия */
+  --dur-1: 120ms;  /* мелкие отклики, reduce motion */
+  --dur-2: 200ms;  /* кнопки, тосты, снап */
+  --dur-3: 280ms;  /* FLIP, листание дня, возврат */
+  --dur-4: 360ms;  /* шторка */
+  --ease-out: cubic-bezier(.2,.8,.2,1);
+  --ease-in: cubic-bezier(.4,0,1,1);
+  --ease-sheet: cubic-bezier(.32,.72,0,1);
+  --ease-spring: cubic-bezier(.3,1.25,.5,1);
+}
+:root {
   --bg: #f3f0e8;
+  --press: rgba(28, 25, 22, .10);
   --ink: #1c1916;
   --paper: #f7f4ee;
-  --muted: #8a8276;
-  --faint: #b3ab9f;
+  --muted: #6f675b;
+  --faint: #857d71;
   --line: #e4ddd2;
   --wash: rgba(28, 25, 22, 0.055);
   --wash-strong: rgba(28, 25, 22, 0.08);
-  --today: rgba(28, 25, 22, 0.12);
-  --done: #9a9286;
+  --today: rgba(28, 25, 22, 0.10);
+  --done-ink: #857d71;
+  --done: var(--done-ink);
   --plate: #e7e1d6;
-  --field: rgba(255, 253, 248, 0.92);
+  --field: #fffdf8;
   --lift: 0 10px 24px rgba(40, 30, 10, 0.08);
-  --font: ui-rounded, "Avenir Next", "SF Pro Rounded", -apple-system, BlinkMacSystemFont, sans-serif;
+  /* Решение 5 (tasks.md): основной текст SF Pro Text, скруглённый — только дата в шапке и пустой день.
+     "Avenir Next" убран: на iOS он перехватывал SF в браузерах без ui-rounded. */
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  --font-display: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --serif: "New York", "Iowan Old Style", Palatino, Georgia, serif;
-  --text: 19px;
-  --hour: 48px;
+  --hour: max(48px, calc(var(--text) * 2.5)); /* R-23: лента растёт вместе с текстом */
+  --ring: rgba(28, 25, 22, 0.18);
+  --line-strong: #d6cec1;
+  --act-defer: #a8612e;
+  --danger: #b3261e;
+  --act-defer-ink: #fffdf8;
+  --act-done: #3f7d4e;
+  --act-done-ink: #f7f4ee;
+  --surface: #fbf9f4;
+  --scrim: rgba(28, 25, 22, .32);
+  --shadow-sheet: 0 -8px 32px rgba(40, 30, 10, .12);
+  --sheet-edge: transparent;
+  --toast-bg: #1c1916;
+  --toast-ink: #f3f0e8;
+  --toast-press: rgba(255, 255, 255, .14);
+  --shadow-toast: 0 8px 24px rgba(28, 25, 22, .18);
+  --edge-1: #ddd6c9;
+  --edge-2: #d3cbbd;
   color-scheme: light;
 }
 
-html[data-text="s"] { --text: 17px; }
-html[data-text="m"] { --text: 19px; }
-html[data-text="l"] { --text: 22px; }
+/* R-23: размер текста — от системного (Dynamic Type: font -apple-system-body, 17 px при стандартной настройке).
+   «как в системе» — 19 px при стандартной, «меньше / обычно / крупнее» — 94 / 106 / 124 % от него.
+   Без системного шрифта (не iOS) база — 19 px. Потолок 28 px, чтобы раскладка не ломалась. */
+:root { --base: 19px; --scale: 1; --text: min(calc(var(--base) * var(--scale)), 28px); }
+@supports (font: -apple-system-body) {
+  html { font: -apple-system-body; }
+  :root { --base: calc(1rem * 19 / 17); }
+}
+html[data-text="s"] { --scale: .94; }
+html[data-text="m"] { --scale: 1.06; }
+html[data-text="l"] { --scale: 1.24; }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #141311;
+    --press: rgba(236, 231, 223, .14);
+    --ring: rgba(236, 231, 223, 0.2);
+    --line-strong: #3a3631;
+    --act-defer: #d08a52;
+    --danger: #f0877d;
+    --act-defer-ink: #141311;
+    --act-done: #6fae7c;
+    --act-done-ink: #141311;
+    --surface: #1f1d1a;
+    --scrim: rgba(0, 0, 0, .55);
+    --shadow-sheet: none;
+    --sheet-edge: #3a3631;
+    --toast-bg: #ece7df;
+    --toast-ink: #141311;
+    --toast-press: rgba(20, 19, 17, .12);
+    --shadow-toast: 0 8px 24px rgba(0, 0, 0, .5);
+    --edge-1: #24211e;
+    --edge-2: #1e1c19;
     --ink: #ece7df;
     --paper: #1c1b18;
     --muted: #a39c91;
-    --faint: #6e685f;
+    --faint: #8a8378;
     --line: #2e2b26;
     --wash: rgba(236, 231, 223, 0.06);
     --wash-strong: rgba(236, 231, 223, 0.1);
-    --today: rgba(236, 231, 223, 0.16);
-    --done: #8f877c;
+    --today: rgba(236, 231, 223, 0.14);
+    --done-ink: #7a7266;
     --plate: #2a2723;
-    --field: #242220;
+    --field: #262420;
     --lift: 0 12px 28px rgba(0, 0, 0, 0.35);
     color-scheme: dark;
   }
@@ -45,6 +104,13 @@ html[data-text="l"] { --text: 22px; }
 * { box-sizing: border-box; }
 html, body { height: 100%; }
 html { -webkit-text-size-adjust: 100%; }
+/* R-18: Safari 26 красит системные панели по фону html — держать его цветом листа. */
+html { background-color: var(--bg); }
+/* R-19: корневой прокрутчик — html; резинку всего документа гасить здесь, не на body. */
+html { overscroll-behavior: none; overflow: hidden; }
+/* Без двойного тапа-зума: быстрые повторные тапы по «+/−», чипам и дате
+   иначе увеличивают страницу в Safari. Щипок остаётся доступен. */
+html, body { touch-action: manipulation; }
 body {
   margin: 0;
   overflow: hidden;
@@ -87,13 +153,41 @@ button {
   cursor: pointer;
 }
 button, .row, .block, .strip { -webkit-tap-highlight-color: transparent; }
+/* R-6: у каждого нажатия есть отклик. Системную подсветку iOS убрали выше, поэтому
+   кнопки чуть сжимаются, а пункты, чипы и дни календаря темнеют (--press поверх фона). */
+button { transition: transform var(--dur-2) var(--ease-out), background-color var(--dur-2) ease; }
+button:active { transform: scale(.96); transition-duration: var(--dur-0); }
+.send:active, .shop-btn:active { transform: scale(.92); }
+.block:active, .hour:active, .strip:active, .date-hit:active, .row:active { transform: none; }
+.menu-item:active, .sheet-action:active, .choice:active, .cal-day:active, .kinds button:active,
+.step:active, .day-toggle:active, .tiny:active, .plate:active, .more-done:active, .archive:active,
+.group-h:active, .hour:active, .date-hit:active, .gear:active, .notice-act:active, .notice-close:active,
+.io button:active, .open-row button:active, .edit-row button:active, .anchors button:active {
+  background-image: linear-gradient(var(--press), var(--press));
+}
+.row { transition: background-color var(--dur-1) ease, color var(--dur-2) var(--ease-out); }
+.row.is-pressed { background-color: var(--press); }
+/* R-26: удержание — строка «вдавливается» с 150 до 450 мс, в момент срабатывания возвращается с перелётом */
+.row.is-holding { transform: scale(.97); background-color: var(--press); transition: transform var(--hold-ms, var(--dur-3)) linear, background-color var(--dur-1) ease; }
+.row.is-hold-pop { transform: scale(1); transition: transform var(--dur-1) var(--ease-spring); }
+@media (prefers-reduced-motion: reduce) {
+  .row.is-holding, .row.is-hold-pop { transform: none; }
+}
+.row.tail-plate.is-pressed { background-image: linear-gradient(var(--press), var(--press)); }
+@media (prefers-reduced-motion: reduce) {
+  button:active, .send:active, .shop-btn:active { transform: none; }
+}
 :focus { outline: none; }
 :focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+/* R-15: строка ввода и поля — мягкое кольцо вместо чёрной рамки. */
+.line, .field { transition: box-shadow var(--dur-1) ease; }
+.line:focus-visible, .field:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--ring); }
 [hidden] { display: none !important; }
 
 .app {
   width: min(480px, 100%);
-  height: 100dvh;
+  height: 100vh;
+  height: var(--vvh, 100dvh);
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -104,27 +198,35 @@ button, .row, .block, .strip { -webkit-tap-highlight-color: transparent; }
   margin: auto;
   color: var(--muted);
   font-size: 15px;
+  /* R-24: при быстром старте надпись не мелькает — видна только после 400 мс. */
+  animation: boot-in var(--dur-2) var(--ease-out) var(--dur-4) both;
 }
+@keyframes boot-in { from { opacity: 0; } }
 
 .top {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 0 8px;
+  /* batch6 P1: minmax(0,1fr) — длинная живая строка сжимается многоточием и не выталкивает #more. */
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 0 4px;
   align-items: start;
   padding: calc(8px + env(safe-area-inset-top)) 18px 4px;
 }
 .date-hit {
   grid-column: 1;
+  min-width: 0;
   text-align: left;
-  padding: 2px 0 6px;
+  /* R-17: одинаковые отступы в обоих состояниях — дата не прыгает при смене дня.
+     Без отрицательного поля: цифра стоит на одной линии с текстом строк. */
+  padding: 6px 12px 8px;
   border-radius: 18px;
+  background: transparent;
+  transition: background-color var(--dur-2) ease;
 }
 .date-hit.is-today {
   background: var(--today);
-  padding: 6px 12px 8px;
 }
 .gear {
-  grid-column: 2;
+  grid-column: 3;
   grid-row: 1;
   width: 44px;
   height: 44px;
@@ -140,9 +242,24 @@ button, .row, .block, .strip { -webkit-tap-highlight-color: transparent; }
   font-weight: 550;
   letter-spacing: 0.01em;
 }
+/* R-32: живая строка — та же высота, одна строка с многоточием. */
+.kicker { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.kicker b { color: var(--ink); font-weight: 650; }
+/* batch7: на SE (320) живая строка без «до 14:00» и «дальше» — «● обед · 15:00 врач». */
+@media (max-width: 359px) { .kicker .now-long { display: none; } }
+.now-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin: 0 6px 1px 0;
+  border-radius: 50%;
+  background: var(--act-defer); /* терракота #a8612e, решение 4 */
+  vertical-align: middle;
+}
+.row.is-flash, .block.is-flash { background: var(--wash); transition: background-color 0ms; }
 .date-line {
   margin: 0;
-  font-family: var(--font);
+  font-family: var(--font-display);
   font-size: 1.85em;
   line-height: 1.12;
   font-weight: 600;
@@ -161,11 +278,13 @@ button, .row, .block, .strip { -webkit-tap-highlight-color: transparent; }
   border-bottom: 1px solid var(--line);
   max-height: 46dvh;
   overflow: auto;
+  overscroll-behavior: contain;
 }
 .panel h2 {
   margin: 12px 0 6px;
   font-size: 13px;
-  font-weight: 550;
+  font-weight: 600;
+  letter-spacing: .02em;
   color: var(--muted);
 }
 .hours-edit, .open-row, .io {
@@ -175,20 +294,51 @@ button, .row, .block, .strip { -webkit-tap-highlight-color: transparent; }
   flex-wrap: wrap;
 }
 .step, .tiny, .day-toggle, .io button, .open-row button {
-  min-height: 36px;
+  /* R-13: зона касания не меньше 44 px */
+  min-height: 44px;
+  min-width: 44px;
   padding: 0 10px;
   border-radius: 999px;
   background: var(--plate);
 }
+/* batch11 P3 (320 pt, крупный текст): «рабочие часы» переносятся парами «− 9:00 +» / «до − 18:00 +», не посреди пары. */
+.hours-pair { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.hours-dash { color: var(--muted); }
 .clock-read {
   min-width: 52px;
   text-align: center;
   font-variant-numeric: tabular-nums;
 }
-.weekdays { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.day-toggle { min-width: 36px; padding: 0; }
-.weekdays .day-toggle[data-weekday=""] { min-width: 58px; padding: 0 8px; }
+/* R-13 fix: «любой» — отдельной строкой во всю ширину, дни 44 × 44 (375 pt: 7 × 44 + 6 × ≈5 = 338 из 339).
+   На 320 pt дни сужаются (≈39 px): 7 × 44 > 284, поэтому ::before соседей перекрываются и по горизонтали
+   зона ≈40 px (в перекрытии выигрывает правый). По вертикали 44. Физически больше не помещается. */
+.day-toggle { min-width: 44px; padding: 0; }
+.day-toggle.day-any { display: flex; width: 100%; align-items: center; justify-content: center; margin-top: 8px; padding: 0 14px; }
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 44px));
+  justify-content: space-between;
+  column-gap: 2px;
+  margin-top: 8px;
+}
+.weekdays .day-toggle { position: relative; min-width: 0; width: 100%; }
+.weekdays .day-toggle::before { content: ""; position: absolute; inset: 0 min(0px, calc((100% - 44px) / 2)); }
 .day-toggle.is-on { background: var(--ink); color: var(--bg); }
+/* R-25: рабочий день — <label> с настоящим <input switch> поверх всей зоны касания
+   (прямое касание переключателя — системный тактильный щелчок iOS 18+). */
+label.day-toggle { display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+.day-switch {
+  -webkit-appearance: none;
+  appearance: none;
+  position: absolute;
+  inset: 0 min(0px, calc((100% - 44px) / 2));
+  z-index: 1;
+  margin: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
+}
 .legend {
   margin: 0 0 8px;
   padding: 0;
@@ -213,7 +363,8 @@ button, .row, .block, .strip { -webkit-tap-highlight-color: transparent; }
 .open-row { align-items: stretch; }
 .open-row input { flex: 1; }
 
-.deck { flex: 1; min-height: 0; overflow: hidden; touch-action: pan-y; }
+/* batch8 P3: пейджер дней — .pager (класс .deck — у «разбора дня», правила больше не пересекаются). */
+.pager { flex: 1; min-height: 0; overflow: hidden; touch-action: pan-y; }
 .track {
   display: flex;
   height: 100%;
@@ -225,21 +376,94 @@ button, .row, .block, .strip { -webkit-tap-highlight-color: transparent; }
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  overscroll-behavior-x: none;
   padding: 4px 22px 28px;
   touch-action: pan-y;
+  display: flex;
+  flex-direction: column;
 }
+.sheet > * { flex: none; }
+/* R-29: пустое место под последней строкой — зона «писать» (не меньше 88 px). */
+.tail-space {
+  position: relative;
+  flex: 1 0 88px;
+  min-height: 88px;
+  display: grid;
+  place-items: center;
+  cursor: text;
+}
+.space-hint { margin: 0; color: var(--muted); font-size: 15px; }
+/* R-11: пустой день — приглашение и 3 примера. */
+.tail-space.is-empty { place-items: start center; }
+.empty {
+  margin-top: 28vh;
+  max-width: 280px;
+  text-align: center;
+  animation: empty-in var(--dur-3) ease both;
+}
+@keyframes empty-in { from { opacity: 0; } }
+.empty-t { margin: 0; font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--ink); }
+.empty-s { margin: 6px 0 0; font-size: 15px; color: var(--muted); }
+.empty-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 16px; }
+.empty-chip {
+  position: relative;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 18px;
+  background: var(--plate);
+  color: var(--ink);
+  font-size: 15px;
+}
+/* зона касания 44 px при видимой высоте 36 */
+.empty-chip::before { content: ""; position: absolute; inset: -4px 0; }
+.empty-chip:active { background: var(--press); }
+.space-mark {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--ring);
+  pointer-events: none;
+}
+.pager { position: relative; }
+.pull-hint {
+  position: absolute;
+  top: 8px;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  margin: 0;
+  text-align: center;
+  font-size: 13.8px;
+  color: var(--muted);
+  opacity: 0;
+  pointer-events: none;
+}
+.pull-hint.is-armed { color: var(--ink); animation: pull-pop var(--dur-1) var(--ease-spring); }
+@keyframes pull-pop { 50% { transform: scale(1.06); } }
 
 .strip {
+  /* R-13: кнопка 44 px, видимая полоса 28 px (::before) — место на экране то же (8 + 28 + 12). */
   position: relative;
   display: block;
   width: 100%;
-  height: 28px;
-  margin: 8px 0 12px;
+  height: 44px;
+  margin: 0 0 4px;
+  border-radius: 0;
+  background: none;
+}
+.strip::before {
+  content: "";
+  position: absolute;
+  inset: 8px 0;
   border-radius: 999px;
   background: var(--paper);
-  overflow: hidden;
 }
+/* R-27: подпись слева в своей зоне, шкала 6–24 — в .strip-track правее неё. */
+.strip { display: flex; align-items: center; }
+.strip-track { position: relative; flex: 1; align-self: stretch; margin: 8px 14px 8px 0; }
 .strip-wash {
   position: absolute;
   top: 0;
@@ -255,8 +479,22 @@ button, .row, .block, .strip { -webkit-tap-highlight-color: transparent; }
   background: var(--ink);
   border-radius: 1px;
 }
+.strip-now {
+  position: absolute;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  border-radius: 50%;
+  background: var(--act-defer);
+  pointer-events: none;
+}
 .strip-label {
   position: relative;
+  flex: none;
+  padding: 0 10px 0 12px;
+  font-weight: 500;
+  white-space: nowrap;
   font-size: 12px;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
@@ -278,6 +516,7 @@ button, .row, .block, .strip { -webkit-tap-highlight-color: transparent; }
   right: 0;
   height: var(--hour);
   border: 0;
+  border-top: 1px solid var(--line); /* iOS < 16.2: без color-mix */
   border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
   background: transparent;
   text-align: left;
@@ -300,7 +539,7 @@ button, .row, .block, .strip { -webkit-tap-highlight-color: transparent; }
   left: 0;
   width: 36px;
   font-size: 12px;
-  color: var(--faint);
+  color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
 .hour-end {
@@ -309,7 +548,7 @@ button, .row, .block, .strip { -webkit-tap-highlight-color: transparent; }
   width: 36px;
   margin-top: -7px;
   font-size: 12px;
-  color: var(--faint);
+  color: var(--muted);
   font-variant-numeric: tabular-nums;
   pointer-events: none;
 }
@@ -347,15 +586,21 @@ button, .row, .block, .strip { -webkit-tap-highlight-color: transparent; }
   flex-direction: row;
   align-items: flex-start;
   gap: 8px;
-  overflow: hidden;
+  /* R-13 fix: без overflow: hidden, чтобы ::before ловил касание за краем (название обрезает само себя). */
   text-align: left;
   padding: 6px 8px 0;
   line-height: 1.2;
-  touch-action: none;
+  /* D-10: быстрый вертикальный свайп по блоку листает расписание; перетаскивание времени
+     (удержание 170 мс, потом вниз/вверх) move() забирает preventDefault'ом первого движения. */
+  touch-action: pan-y;
 }
+/* R-13 fix: видимый блок 36 px (шкала 48 px/час не меняется), зона касания 44 px. */
+.block::before { content: ""; position: absolute; inset: -4px 0; }
 .block p { margin: 0; }
 .block .block-time {
-  flex: none;
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
   font-size: 0.78em;
   font-variant-numeric: tabular-nums;
   color: var(--muted);
@@ -375,21 +620,68 @@ button, .row, .block, .strip { -webkit-tap-highlight-color: transparent; }
 }
 .block.slot { border-left: 2px solid var(--ink); }
 .block.habit { border-left: 2px dashed var(--muted); color: var(--muted); }
-.block.is-done.is-fade { opacity: 0.38; }
-.block.is-done.is-strike .block-title { text-decoration: line-through; text-decoration-thickness: 1px; }
+/* batch3 R-10: сделанный блок — явные цвета вместо opacity .6 (время было 2.34:1): заголовок --done-ink, время --faint ≥ 3:1 на фоне окна. */
+.block.is-done.is-fade { color: var(--done-ink); }
+.block.is-done.is-fade .block-time { color: var(--faint); }
+.block.window.is-done.is-fade { background: var(--wash); }
+.block.slot.is-done.is-fade { border-left-color: var(--done-ink); }
+.block.habit.is-done.is-fade { border-left-color: var(--faint); }
+.block.is-done.is-strike .block-title { text-decoration: line-through; text-decoration-thickness: 1.5px; }
 .block.is-lifted { z-index: 4; }
 
 
-.rows { display: flex; flex-direction: column; gap: 0; }
+.rows { position: relative; display: flex; flex-direction: column; gap: 0; }
+
+/* R-7: подложка свайпа под строкой: действие видно во время жеста, порог — «щелчком». */
+.swipe-under {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  border-radius: 12px;
+  opacity: .55;
+  pointer-events: none;
+  transition: opacity var(--dur-1) var(--ease-out);
+}
+.swipe-under.is-done { background: var(--act-done); color: var(--act-done-ink); }
+.swipe-under.is-defer { background: var(--act-defer); color: var(--act-defer-ink); }
+.swipe-under.is-undo { background: var(--muted); color: var(--bg); }
+.swipe-under.at-right { justify-content: flex-end; padding-right: 18px; }
+.swipe-under.at-left { justify-content: flex-start; padding-left: 18px; }
+.su-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transform: scale(.8);
+  transition: transform var(--dur-1) var(--ease-out);
+}
+.swipe-under.at-left .su-mark { transform-origin: left center; }
+/* batch3 R-7: справа иконка у внешнего края — на частичном свайпе видна первой, а не обрезанное «…тово». */
+.swipe-under.at-right .su-mark { transform-origin: right center; flex-direction: row-reverse; }
+.su-mark .ico { width: 22px; height: 22px; }
+.su-mark .ico path, .su-mark .ico circle, .su-mark .ico rect { stroke-width: 2; }
+.su-word { font-size: 15px; font-weight: 600; white-space: nowrap; }
+.su-word { opacity: 0; transition: opacity var(--dur-1) var(--ease-out); }
+.swipe-under.is-roomy .su-word { opacity: 1; }
+.swipe-under.is-armed { opacity: 1; }
+.swipe-under.is-armed .su-mark { transform: scale(1); transition: transform var(--dur-1) var(--ease-spring); }
+.swipe-under.is-leaving { opacity: 0; transition: opacity var(--dur-2) ease; }
+.row.is-swiping, .block.is-swiping { z-index: 2; background-color: var(--bg); }
+.block.window.is-swiping { background-image: linear-gradient(var(--wash-strong), var(--wash-strong)); }
+.block.is-swiping { z-index: 3; }
+.row.tail-plate.is-swiping { background-color: var(--plate); }
+@media (prefers-reduced-motion: reduce) {
+  .su-mark, .swipe-under.is-armed .su-mark { transform: none; }
+}
 .rows.plan { gap: 0; }
 .row {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto 36px;
+  grid-template-columns: minmax(0, 1fr) auto 44px;
   column-gap: 8px;
   align-items: center;
-  min-height: 42px;
-  padding: 5px 4px 5px 8px;
+  min-height: 48px;
+  padding: 6px 4px 6px 10px;
   border-radius: 12px;
   text-align: left;
   touch-action: pan-y;
@@ -415,7 +707,9 @@ button, .row, .block, .strip { -webkit-tap-highlight-color: transparent; }
   color: var(--ink);
 }
 .tag { color: var(--muted); margin-right: 6px; }
+/* R-22: ручка — зона «готово» 56 px (колонка 44 + поле 12 справа через ::before). */
 .grip {
+  position: relative;
   grid-column: 3;
   grid-row: 1 / -1;
   align-self: stretch;
@@ -424,34 +718,72 @@ button, .row, .block, .strip { -webkit-tap-highlight-color: transparent; }
   justify-content: center;
   align-items: center;
   gap: 3px;
-  min-width: 36px;
+  min-width: 44px;
   min-height: 44px;
   border-radius: 8px;
-  color: var(--muted);
-  touch-action: none;
+  color: var(--faint); /* batch2 п.15: чёрточки тише текста */
+  touch-action: pan-y; /* вертикаль с ручки — прокрутка; порядок только после удержания */
+  outline: none;
 }
+.grip::before { content: ""; position: absolute; inset: 0 -12px 0 0; }
+.grip::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border-radius: 50%;
+  background: var(--press, rgba(28, 25, 22, .08));
+  opacity: 0;
+  transition: opacity var(--dur-1) ease;
+  pointer-events: none;
+}
+.grip.is-pressed::after { opacity: 1; transition-duration: 0ms; }
+.grip i { transition: transform var(--dur-2) var(--ease-out); }
+.grip.is-fired i:nth-child(1) { transform: translateY(5px); }
+.grip.is-fired i:nth-child(3) { transform: translateY(-5px); }
+.grip:focus-visible::after { opacity: 1; }
+/* Крупный текст: видимый кружок вместо чёрточек (решение пользователя 4, R-12). */
+.large .grip i { display: none; }
+.large .grip { color: var(--muted); } /* batch2 п.16: рамка кружка ≥ 3:1 */
+.large .grip > i:first-child { display: block; position: absolute; width: 22px; height: 22px; border: 1.5px solid currentColor; border-radius: 50%; background: none; box-sizing: border-box; transform: none; }
+.large .row.is-done .grip > i:first-child { background: currentColor; }
 .grip i {
   display: block;
-  width: 14px;
+  width: 16px;
   height: 2px;
   border-radius: 99px;
   background: currentColor;
 }
 .ink {
   position: absolute;
-  left: 0;
-  right: 40px;
-  top: 50%;
-  height: 1px;
-  background: var(--done);
+  left: var(--ink-l, 0);
+  width: var(--ink-w, calc(100% - 48px)); /* batch5 P3: по тексту (inkToText) */
+  top: var(--ink-top, 50%); /* batch6 P3: у названия в две строки — середина первой строки */
+  height: 1.5px;
+  margin-top: -0.75px;
+  background: var(--done-ink);
   transform: scaleX(var(--strike, 0));
   transform-origin: left center;
   pointer-events: none;
-  transition: transform 180ms cubic-bezier(.2, .7, .2, 1);
+  transition: transform var(--dur-2) var(--ease-out);
 }
-.row.is-done.is-fade { opacity: 0.38; }
-.row.is-done.is-strike { --strike: 1; color: var(--done); }
-.row.is-done.is-strike .meta, .row.is-done.is-strike .tag, .row.is-done.is-strike .gutter { color: var(--faint); }
+/* R-10: сделанное читается (≥ 3:1): цвет --done-ink и черта 1.5 px, без opacity. */
+.row.is-done.is-fade { color: var(--done-ink); }
+/* batch3: в покое зачёркнут только текст (как в макете 01); .ink — лишь на время анимации вычёркивания. */
+.row.is-done.is-strike { color: var(--muted); color: color-mix(in srgb, var(--ink) 70%, var(--bg)); } /* первое — для iOS < 16.2 */
+.row.is-done.is-strike > .title {
+  -webkit-text-decoration-line: line-through;
+  text-decoration-line: line-through;
+  text-decoration-thickness: 1.5px;
+  text-decoration-color: currentColor;
+}
+.row.is-done.is-fade.is-strike { color: var(--done-ink); }
+.row.is-done .ink { background: currentColor; }
+.row.is-done .meta, .row.is-done .tag, .row.is-done .gutter { color: var(--faint); }
+.row.is-done .gutter.in-work { background: none; }
 .row.is-selected { background: var(--field); }
 .row.is-stay { background: var(--today); }
 .row.is-lifted {
@@ -480,23 +812,22 @@ button, .row, .block, .strip { -webkit-tap-highlight-color: transparent; }
   font-size: 1em;
   text-align: left;
 }
-.went { color: var(--faint); }
 .inline-add { margin-top: 4px; }
 .field::placeholder, #open-line::placeholder {
-  color: var(--ink);
-  opacity: 0.3;
+  color: var(--muted);
+  opacity: 1;
 }
 .kinds, .edit-row, .time-fields, .anchors {
   grid-column: 1 / -1;
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
   align-items: center;
   padding-top: 8px;
 }
 .kinds button, .edit-row button, .anchors button {
-  min-height: 32px;
-  padding: 0 10px;
+  min-height: 44px;
+  padding: 0 14px;
   border-radius: 999px;
   background: var(--plate);
   font-size: 14px;
@@ -514,6 +845,7 @@ button, .row, .block, .strip { -webkit-tap-highlight-color: transparent; }
 .more-done, .archive {
   display: block;
   width: 100%;
+  min-height: 44px;
   margin: 10px 0 0;
   padding: 8px 4px;
   color: var(--muted);
@@ -529,7 +861,7 @@ button, .row, .block, .strip { -webkit-tap-highlight-color: transparent; }
   border-radius: 10px;
   background: var(--plate);
   font-size: 14px;
-  transition: transform 120ms ease, background 120ms ease, color 120ms ease;
+  transition: transform var(--dur-1) ease, background var(--dur-1) ease, color var(--dur-1) ease;
 }
 .plate.is-on { background: var(--ink); color: var(--bg); transform: translateX(8px); }
 
@@ -549,6 +881,49 @@ button, .row, .block, .strip { -webkit-tap-highlight-color: transparent; }
   font-size: max(16px, var(--text));
 }
 .compose-row { display: flex; align-items: center; gap: 8px; }
+
+/* Плашка над строкой ввода (резерв хранилища Q-7, «на экран Домой» R-20). */
+.notice {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 52px;
+  margin: 0 0 10px;
+  padding: 4px 4px 4px 16px;
+  border-radius: 16px;
+  background: var(--plate, #e7e1d6);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.3;
+}
+.notice[hidden] { display: none; }
+.notice-text { flex: 1; min-width: 0; }
+.notice-act, .notice-close {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  color: inherit;
+}
+.notice-close { padding: 0; display: inline-grid; place-items: center; }
+.notice-close .ico { width: 18px; height: 18px; }
+
+.steps { margin: 4px 0 12px; padding: 0; list-style: none; display: grid; gap: 10px; }
+.steps li { display: flex; align-items: center; gap: 12px; font-size: 16px; line-height: 1.3; }
+.step-ico {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--plate, #e7e1d6);
+  color: var(--ink);
+}
+.step-ico .ico { width: 22px; height: 22px; }
+.step-word { font-size: 14px; font-weight: 600; }
 .line {
   display: block;
   width: 100%;
@@ -575,17 +950,28 @@ button, .row, .block, .strip { -webkit-tap-highlight-color: transparent; }
 .compose-row .line { flex: 1; width: auto; }
 .line.is-empty::before {
   content: attr(data-placeholder);
-  color: var(--ink);
-  opacity: 0.3;
+  color: var(--muted);
+  opacity: 1;
   pointer-events: none;
 }
+/* batch11 P3: на 320 pt при крупном тексте подсказка не обрезается — не крупнее 21 px и переносится в две строки. */
+.line.is-empty { position: relative; }
+.line.is-empty::before {
+  position: absolute;
+  inset: 0 14px;
+  display: flex;
+  align-items: center;
+  font-size: min(1em, 21px);
+  line-height: 1.05;
+  white-space: normal;
+  overflow: hidden;
+}
 .line.is-empty br { display: none; }
-.line .kw {
-  font-weight: 400;
-  background: var(--wash-strong);
-  border-radius: 4px;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
+/* Подсветка разбора без изменения DOM строки (CSS Custom Highlight API). */
+::highlight(kw) { background-color: rgba(28, 25, 22, 0.1); }
+::highlight(sep) { color: var(--act-defer); } /* R-35: разделитель дел */
+@media (prefers-color-scheme: dark) {
+  ::highlight(kw) { background-color: rgba(236, 231, 223, 0.14); }
 }
 .shop-line { margin-top: 8px; }
 .shop-btn {
@@ -625,70 +1011,202 @@ button, .row, .block, .strip { -webkit-tap-highlight-color: transparent; }
 }
 .send .ico { width: 20px; height: 20px; }
 .ico { width: 20px; height: 20px; flex: none; }
-.group-h .went { margin-left: auto; }
 .cal-head .step:first-child .ico { transform: rotate(-90deg); }
 .cal-head .step:last-child .ico { transform: rotate(90deg); }
 .rail-close button { display: inline-flex; align-items: center; gap: 6px; }
 .rail-close .ico { width: 16px; height: 16px; }
+/* R-33: чипы из истории над строкой ввода — 36 px, ряд прокручивается вбок.
+   batch7: прокрутка режет всё, что вне ряда, — поэтому поля 4 px сверху и снизу внутри ряда
+   (и −4 px снаружи), тогда ::before чипа (попадание 44) целиком внутри. */
+.chips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -4px 0 4px;
+  padding-block: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  touch-action: pan-x;
+}
+.chips::-webkit-scrollbar { display: none; }
+.chips[hidden] { display: none; }
+.chips-h { flex: none; font-size: 13px; color: var(--muted); white-space: nowrap; }
+.chip {
+  position: relative;
+  flex: none;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 18px;
+  background: var(--field);
+  font-size: 15px;
+  white-space: nowrap;
+}
+.chip::before { content: ""; position: absolute; inset: -4px 0; } /* попадание 44 */
+.chip:active { background: var(--press); }
 .ghost {
   min-height: 18px;
   margin: 0;
   font-size: 13px;
   color: var(--muted);
 }
-.ghost.is-hint { color: var(--faint); }
+.ghost.is-hint { color: var(--muted); }
+/* R-33: дополнение — набранное обычным цветом, продолжение серым; зона тапа 44 px. */
+/* batch7: зона 44 — сам абзац высотой 44 (строка ввода его больше не перекрывает), текст по центру;
+   продолжение цветом --muted (контраст ≥ 4.5 при 13 px). */
+.ghost.is-complete { display: flex; align-items: center; min-height: 44px; color: var(--ink); cursor: pointer; }
+.ghost-rest { color: var(--muted); }
 
+/* R-31: «хвост» — плашка-стопка (макет concepts/01-today, ②). */
+.tail { position: relative; margin: 2px 0 14px; }
+.row.tail-plate, .snap-tail {
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 64px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--plate);
+  cursor: pointer;
+}
+.tail-text { min-width: 0; }
+/* R-31: плашка 64 px по макету — строки 20 + 18 при padding 12 + 2 зазора. */
+.tail .t1 { margin: 0; font-size: 16px; font-weight: 600; line-height: 20px; }
+.tail .t2 {
+  margin: 2px 0 0;
+  font-size: 13.8px;
+  line-height: 18px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tail .go { white-space: nowrap; font-size: 13.8px; font-weight: 600; color: var(--act-defer); }
+.tail .edge {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: -5px;
+  z-index: 2;
+  height: 10px;
+  border-radius: 0 0 12px 12px;
+  background: var(--edge-1);
+  pointer-events: none;
+}
+.tail .edge.e2 { left: 16px; right: 16px; bottom: -9px; z-index: 1; background: var(--edge-2); }
+.tail.is-open { margin-bottom: 6px; }
+.tail.is-open .edge { display: none; }
+.rows.tail-rows { margin-bottom: 10px; }
+.rows.drafts.past { margin-bottom: 6px; }
+
+/* R-15: строка-черновик (макет concepts/01-today, ③). */
+.row.draft .title {
+  justify-self: start;
+  max-width: 100%;
+  font-style: italic;
+  color: var(--muted);
+  border-bottom: 1.5px dashed var(--line-strong);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.draft-pill {
+  grid-column: 2;
+  margin-right: 8px;
+  padding: 2px 7px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 12.75px;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+/* R-8: тост над строкой ввода (зазор 8 px при любом размере текста), кнопки 44×44. */
 .toast {
   position: absolute;
   left: 16px;
   right: 16px;
-  bottom: calc(78px + env(safe-area-inset-bottom));
+  bottom: calc(var(--compose-h, calc(88px + env(safe-area-inset-bottom))) + 8px);
   z-index: 6;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: var(--ink);
-  color: var(--bg);
-  font-size: 14px;
+  gap: 8px;
+  min-height: 52px;
+  padding: 4px 6px 4px 16px;
+  border-radius: 16px;
+  background: var(--toast-bg);
+  color: var(--toast-ink);
+  box-shadow: var(--shadow-toast);
+  font-size: 15px;
+  line-height: 1.3;
+  touch-action: none;
 }
-.toast-actions { display: flex; gap: 12px; }
-.toast button { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+/* batch4 P1: над открытой шторкой (z 21) и над её верхом; у высокой шторки — не выше экрана. */
+body.has-sheet .toast {
+  z-index: 22;
+  bottom: min(calc(var(--sheet-h, 0px) + 8px), calc(var(--vvh, 100dvh) - 60px - env(safe-area-inset-top)));
+}
+.toast.is-in { animation: toast-in var(--dur-2) var(--ease-out); }
+.toast.is-out { animation: toast-out var(--dur-2) var(--ease-in) forwards; pointer-events: none; }
+@keyframes toast-in { from { opacity: 0; transform: translateY(12px); } }
+@keyframes toast-out { to { opacity: 0; transform: translateY(12px); } }
+.toast-actions { display: flex; gap: 2px; flex: none; }
+.toast button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 12px;
+  color: inherit;
+  font-weight: 600;
+}
+.toast button:active { background: var(--toast-press); }
 
 .scrim {
   position: absolute;
   inset: 0;
   z-index: 20;
-  background: rgba(28, 25, 22, 0.28);
+  background: var(--scrim);
 }
+.scrim.is-ghost, .sheet-ui.is-ghost { pointer-events: none; }
 .sheet-ui {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
   z-index: 21;
-  max-height: min(78dvh, 680px);
+  /* От видимой высоты (--vvh из visualViewport), а не от dvh: иначе при
+     открытой клавиатуре iOS верх шторки уходит за экран. */
+  max-height: min(calc(var(--vvh, 100dvh) - env(safe-area-inset-top) - 12px), 680px);
   overflow: auto;
+  overscroll-behavior: contain;
   padding: 6px 18px calc(16px + env(safe-area-inset-bottom));
-  background: var(--bg);
+  /* R-9: поднятая поверхность светлее листа (в тёмной теме — на шаг, с краем вместо тени). */
+  background: var(--surface);
   border-radius: 24px 24px 0 0;
-  box-shadow: 0 -12px 40px rgba(28, 25, 22, 0.1);
+  box-shadow: var(--shadow-sheet);
+  border-top: 1px solid var(--sheet-edge);
+  will-change: transform;
 }
 .grab {
   width: 36px;
-  height: 4px;
-  margin: 6px auto 12px;
-  border-radius: 99px;
-  background: var(--line);
+  height: 5px;
+  margin: 2px auto 12px;
+  border-radius: 3px;
+  background: var(--faint);
 }
 .sheet-ui h2 {
   margin: 14px 4px 8px;
   font-size: 13px;
-  font-weight: 550;
+  font-weight: 600;
+  letter-spacing: .02em;
   color: var(--muted);
 }
+.menu-head { display: flex; align-items: baseline; gap: 10px; margin: 2px 0 8px; padding: 0 14px; min-width: 0; }
+.menu-head-title { margin: 0; flex: 1; min-width: 0; font-size: 15px; font-weight: 600; line-height: 20px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.menu-head-time { margin: 0; flex: none; font-size: 13.8px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .menu-item, .sheet-action {
   display: flex;
   gap: 10px;
@@ -715,11 +1233,26 @@ button, .row, .block, .strip { -webkit-tap-highlight-color: transparent; }
   text-align: center;
 }
 .kinds { display: flex; gap: 8px; margin: 8px 0; flex-wrap: wrap; }
+/* UX (R-23): сегментный переключатель размера текста — одна строка, 4 зоны ≥ 44 px (и на 320 pt) */
+.seg { display: flex; flex-wrap: nowrap; gap: 2px; margin: 8px 0; padding: 2px; border-radius: 24px; background: var(--field); }
+.seg-btn { flex: 1 1 0; min-width: 44px; min-height: 44px; padding: 0 4px; border-radius: 22px; background: transparent; white-space: nowrap; line-height: 1; font-weight: 600; }
+.seg-btn.is-on { background: var(--ink); color: var(--bg); }
+.seg-auto { flex-grow: 1.6; font-size: 14px; font-weight: 500; }
+.seg-s { font-size: 13px; }
+.seg-m { font-size: 17px; }
+.seg-l { font-size: 21px; }
 .from-days .choice { flex: none; min-width: 64px; padding: 0 8px; }
+/* Время суток привычки — одной строкой и на 320 pt: пять чипов, узкие поля. */
+.kinds.habit-anchors { flex-wrap: nowrap; gap: 6px; }
+.kinds.habit-anchors button { min-width: 44px; padding: 0 6px; } /* batch6 P3: «утро» было 43.9 на 320 */
+/* «на день раньше / позже» — одной строкой и на 320 pt. */
+.shift-row .sheet-action { min-width: 0; padding: 0 8px; white-space: nowrap; font-size: 0.85em; }
 .kinds button, .choice {
-  flex: 1;
-  min-height: 40px;
-  border-radius: 14px;
+  flex: 1 1 auto;
+  min-height: 44px;
+  padding: 0 12px;
+  white-space: nowrap;
+  border-radius: 22px;
   background: var(--field);
   font-size: 14px;
 }
@@ -745,9 +1278,9 @@ button, .row, .block, .strip { -webkit-tap-highlight-color: transparent; }
   margin-bottom: 8px;
 }
 .cal-head strong { text-align: center; font-weight: 550; }
-.cal-week { color: var(--faint); font-size: 12px; text-align: center; margin-bottom: 4px; }
+.cal-week { color: var(--muted); font-size: 12px; text-align: center; margin-bottom: 4px; }
 .cal-day {
-  height: 40px;
+  height: 44px;
   border-radius: 12px;
   font-variant-numeric: tabular-nums;
 }
@@ -757,15 +1290,20 @@ button, .row, .block, .strip { -webkit-tap-highlight-color: transparent; }
   position: absolute;
   left: 0;
   right: 0;
-  bottom: calc(78px + env(safe-area-inset-bottom));
+  bottom: calc(var(--compose-h, calc(88px + env(safe-area-inset-bottom))) + 8px);
   z-index: 6;
   display: flex;
   justify-content: center;
   pointer-events: none;
+  transition: transform var(--dur-2) var(--ease-out);
 }
+/* Пока виден тост, «к списку» стоит над ним (52 + 8). */
+body.has-toast .rail-close { transform: translateY(-60px); }
+/* Последний блок ленты прокручивается выше «к списку». */
+body.rail-open .sheet { padding-bottom: calc(28px + 54px); }
 .rail-close button {
   pointer-events: auto;
-  min-height: 38px;
+  min-height: 44px;
   padding: 0 16px;
   border-radius: 999px;
   background: var(--ink);
@@ -773,6 +1311,10 @@ button, .row, .block, .strip { -webkit-tap-highlight-color: transparent; }
   font-size: 14px;
 }
 .depth.in-sheet { padding-bottom: 8px; }
+
+/* Клавиатура открыта: нижний safe-area inset (34 px) закрыт клавиатурой. */
+.kb-open .compose { padding-bottom: 8px; }
+.kb-open .sheet-ui { padding-bottom: 12px; }
 
 .sr-file {
   position: absolute;
@@ -783,9 +1325,180 @@ button, .row, .block, .strip { -webkit-tap-highlight-color: transparent; }
 }
 body.is-dragging, body.is-dragging .row { user-select: none; -webkit-user-select: none; }
 
+/* R-28: reduce motion — не выключаем всё, а оставляем только мягкое появление (opacity, --dur-1). */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation: none !important;
-    transition: none !important;
+    transition-property: opacity !important;
+    transition-duration: var(--dur-1) !important;
+    transition-timing-function: ease !important;
   }
 }
+
+/* R-12: текст только для VoiceOver. */
+.sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+#sheet-h:focus, .sheet-ui:focus { outline: none; }
+.row:focus-visible, .row:has(> .title:focus-visible) { outline: 2px solid var(--ring); outline-offset: -2px; border-radius: 12px; }
+.row > .title:focus-visible { outline: none; }
+
+/* R-34: разбор дня — шторка на 88 %, карточка 340×200, под ней края двух следующих. */
+/* batch9 п.4: лист разбора по содержимому (не 88% экрана) — карта и кнопки сразу под заголовком, кнопки внизу, у большого пальца */
+.sheet-ui:has(> .deck) { max-height: calc(var(--vvh, 100dvh) * 0.88); height: auto; display: flex; flex-direction: column; box-sizing: border-box; }
+.deck { display: flex; flex-direction: column; gap: 14px; flex: 1; min-height: 0; }
+.deck-top { display: flex; align-items: center; gap: 10px; }
+.deck-title { margin: 0; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.deck-back { min-height: 44px; padding: 0 12px; border: 0; border-radius: 12px; background: transparent; color: var(--ink); font: inherit; font-size: 15px; }
+.deck-back:disabled { color: var(--faint); }
+.deck-dots { display: flex; gap: 6px; justify-content: flex-end; }
+.deck-dots i { width: 18px; height: 4px; border-radius: 2px; background: var(--line-strong); }
+.deck-dots i.is-past, .deck-dots i.is-cur { background: var(--ink); }
+/* batch8 P3: карточка и кнопки — одной группой у нижнего края (к большому пальцу), без пустоты между ними. */
+.deck-stack { position: relative; width: min(340px, 100%); height: 200px; margin: 10px auto 76px; } /* от карты до кнопок ≈ 90 px, как в 02-razbor */
+.deck-card { position: absolute; inset: 0; border-radius: 22px; background: var(--surface); border: 1px solid var(--line); box-shadow: 0 10px 28px rgba(0, 0, 0, .12); padding: 22px 22px 18px; box-sizing: border-box; touch-action: none; user-select: none; -webkit-user-select: none; }
+.deck-card.is-u1 { transform: translateY(8px) scale(.96); opacity: .8; }
+.deck-card.is-u2 { transform: translateY(16px) scale(.92); opacity: .55; }
+.deck-card.is-top { z-index: 2; cursor: grab; }
+.deck-card.is-top:focus:not(:focus-visible) { outline: none; }
+/* batch8 P2-3: подложка направления над краями нижних карточек (z 1), под верхней (z 2). */
+.deck-bed { position: absolute; inset: 0; z-index: 1; border-radius: 22px; display: flex; align-items: center; padding: 0 24px; color: #fff; font-weight: 650; font-size: 17px; }
+.deck-bed.is-done { background: var(--act-done); justify-content: flex-end; }
+.deck-bed.is-move, .deck-bed.is-pick { background: var(--act-defer); }
+.deck-bed.is-keep { background: var(--ink); color: var(--bg); justify-content: center; align-items: flex-end; padding-bottom: 18px; }
+.deck-when { margin: 0 0 8px; color: var(--muted); font-size: 15px; }
+.deck-name { margin: 0; font-size: 22px; font-weight: 650; line-height: 1.25; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.deck-carried { margin: 8px 0 0; color: var(--muted); font-size: 15px; }
+.deck-arm { position: absolute; left: 18px; right: 18px; bottom: 16px; display: flex; gap: 10px; }
+.deck-arm button { flex: 1; min-height: 44px; border-radius: 12px; border: 1px solid var(--line-strong); background: var(--bg); color: var(--ink); font: inherit; }
+.deck-arm .deck-del { background: #b3261e; border-color: #b3261e; color: #fff; }
+.deck-btns { display: grid; grid-template-columns: repeat(4, minmax(0, 72px)); gap: 10px; justify-content: center; margin-top: 0; }
+.deck-btn { min-height: 56px; border: 0; border-radius: 14px; background: var(--line); color: var(--ink); font: inherit; font-size: 13px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 4px 2px; }
+.deck-btn b { font-size: 17px; font-weight: 600; }
+.deck-btn.is-go { background: var(--act-defer); color: #fff; }
+.deck-days { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 0; }
+.deck-day, .deck-unpick { min-height: 48px; border-radius: 12px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font: inherit; font-size: 15px; }
+.deck-unpick { border: 0; background: transparent; color: var(--muted); }
+.deck-sum { margin: 0; text-align: center; color: var(--muted); font-size: 14px; }
+.deck-sum.is-end { margin: auto 0; font-size: 20px; line-height: 1.35; color: var(--ink); }
+.deck-close { margin-top: 0; }
+@media (prefers-reduced-motion: reduce) { .deck-card.is-u1, .deck-card.is-u2 { transition: none; } }
+.deck-line { display: block; width: 100%; min-height: 44px; margin: 6px 0 0; padding: 0 18px; border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 15px; text-align: left; }
+
+/* R-35: превью нескольких дел над строкой ввода. */
+.many { margin: 0 0 8px; padding: 10px 14px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); font-size: 14px; max-height: 40vh; overflow: auto; }
+.many[hidden] { display: none; }
+.many-h { margin: 0 0 6px; font-weight: 600; color: var(--ink); }
+.many ul { margin: 0; padding: 0; list-style: none; }
+.many li { padding: 3px 0; color: var(--muted); overflow-wrap: anywhere; }
+.many li.is-done { text-decoration: line-through; }
+.many-more { margin: 6px 0 0; color: var(--muted); }
+
+/* R-36: прогресс удержания — кольцо у пальца, заполняется за оставшиеся 300 мс. */
+.hold-ring { position: fixed; z-index: 60; width: 56px; height: 56px; margin: -28px 0 0 -28px; border-radius: 50%; border: 3px solid var(--act-defer); pointer-events: none; opacity: .9; animation: hold-fill var(--hold-ms, var(--dur-3)) linear forwards; }
+@keyframes hold-fill { from { transform: scale(.35); opacity: .25; } to { transform: scale(1); opacity: .9; } }
+
+/* R-37: снимок дня до загрузки JS — та же вёрстка шапки и строк, без жестов. */
+.snap-top .date-hit { cursor: default; }
+#snap-rest { font-size: 0.62em; font-weight: 550; margin-left: 6px; letter-spacing: -0.02em; }
+.snap-sheet { flex: 1; min-height: 0; overflow: hidden; padding: 4px 22px 28px; }
+/* batch10 P2-6: снимок с местами строк и коробок — отсчёт от верха листа, как в живом дне */
+.snap-sheet { position: relative; }
+.snap-place { position: absolute; inset: 0; }
+.snap-place .rows { position: static; }
+.snap-box { pointer-events: none; }
+.snap-tail { height: 100%; box-sizing: border-box; }
+/* место ручки и кнопки настроек — чтобы строки и дата не сдвигались при подмене живым днём */
+.snap-sheet .row::after { content: ""; grid-column: 3; grid-row: 1; width: 44px; height: 44px; }
+.snap-top::after { content: ""; width: 44px; height: 44px; }
+.snap-boot { flex: 1; display: grid; place-items: center; margin: 0; }
+
+/* batch9 п.5: «удалить…» в разборе — скрыта, пока до неё не дошли с клавиатуры */
+.deck-armkey:not(:focus-visible) { position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.deck-armkey:focus-visible { align-self: center; min-height: 44px; padding: 0 18px; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--surface); color: var(--ink); font: inherit; font-size: 15px; }
+/* R-38: правка на месте — текст строки сам становится полем, под ним полоса чипов 44 px */
+.row.is-inline { background: var(--field); }
+.row.is-inline .title { outline: none; user-select: text; -webkit-user-select: text; cursor: text; caret-color: var(--ink); }
+/* batch10 P3: панель правки на месте — в полосе ввода над клавиатурой; чипы — один ряд с прокруткой вбок */
+.inline-bar { min-height: 44px; margin: 0 -18px 6px; }
+.compose.is-inline #chips, .compose.is-inline #many, .compose.is-inline #ghost { display: none; }
+.inline-say { margin: 0 18px 4px; color: var(--muted); font-size: 13.8px; line-height: 18px; }
+.inline-say:empty { display: none; }
+.inline-chips {
+  display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 18px;
+  overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain;
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
+}
+.inline-chips.at-end { -webkit-mask-image: none; mask-image: none; }
+.inline-chips::-webkit-scrollbar { display: none; }
+.inline-chip { flex: none; }
+.inline-chip.is-danger { color: var(--danger); }
+
+/* R-39: чипы времени в меню удержания */
+.menu-times { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 4px 10px; }
+.menu-times .chip { min-width: 44px; }
+
+/* R-39: метка времени над пальцем, пока дело держат над часами */
+.drop-time { position: fixed; left: 0; top: 0; z-index: 60; display: flex; flex-direction: column; align-items: center; min-width: 104px; max-width: min(280px, calc(100vw - 16px)); box-sizing: border-box; padding: 8px 16px; border-radius: 16px; background: var(--ink); color: var(--bg); box-shadow: 0 10px 28px rgba(0, 0, 0, .28); text-align: center; pointer-events: none; }
+.drop-time[hidden] { display: none; }
+.drop-title { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; line-height: 20px; font-weight: 500; opacity: .85; }
+.drop-clock { font-size: 32px; line-height: 40px; font-weight: 650; font-variant-numeric: tabular-nums; }
+@media (prefers-color-scheme: dark) {
+  .drop-time { box-shadow: 0 0 0 1px var(--sheet-edge), 0 12px 32px rgba(0, 0, 0, .7); }
+}
+.row.is-scheduling { opacity: .4; box-shadow: none; } /* batch11: ждёт на месте, пока над пальцем карточка #drop-time */
+
+/* R-40: неделя */
+.cal-week-btn { margin: 0 0 10px; }
+/* batch11: размеры недели — от --text (R-23), растут с текстом. */
+/* batch11 (макет 04): неделя — на весь экран, фон листа; «неделя 40», под ней «28 сен – 4 окт», подсказка внизу. */
+.sheet-ui:has(> .week) {
+  top: 0;
+  max-height: none;
+  height: var(--vvh, 100dvh);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding-top: calc(10px + env(safe-area-inset-top));
+  border-radius: 0;
+  border-top: 0;
+  box-shadow: none;
+  background: var(--bg);
+}
+.sheet-ui:has(> .week) > .grab { display: none; }
+.week { display: flex; flex-direction: column; flex: 1 0 auto; }
+.week-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin: 0 0 10px; padding-left: 6px; }
+.week-name { min-width: 0; }
+.week-steps { display: flex; gap: 4px; flex: none; }
+.week-steps .step:first-child .ico { transform: rotate(-90deg); }
+.week-steps .step:last-child .ico { transform: rotate(90deg); }
+.sheet-ui .week-title, .week-title { margin: 0; font-size: calc(var(--text) * 1.47); font-weight: 650; letter-spacing: -.01em; line-height: 1.15; text-transform: none; color: var(--ink); }
+.week-range { margin: 2px 0 0; color: var(--muted); font-size: calc(var(--text) * .74); }
+.week-hint { margin: auto 0 0; padding: 18px 12px 4px; text-align: center; color: var(--muted); font-size: calc(var(--text) * .68); line-height: 1.4; }
+.week-btn { grid-column: 2; grid-row: 1; width: 44px; height: 44px; display: grid; place-items: center; color: var(--muted); }
+.week-btn .ico { width: 22px; height: 22px; }
+.week-days { display: flex; flex-direction: column; gap: 4px; touch-action: pan-y; }
+.week-day { position: relative; display: grid; grid-template-columns: calc(var(--text) * 2.75) minmax(0, 1fr); align-items: center; min-height: max(56px, calc(var(--text) * 2.95)); border-radius: 12px; padding: 4px 6px; }
+.week-day.is-today { background: var(--plate); }
+.week-day.is-drop { outline: 2px solid var(--act-defer); outline-offset: -2px; }
+.week-head { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 48px; border: 0; border-radius: 10px; background: transparent; color: var(--ink); font: inherit; font-size: calc(var(--text) * .7); }
+.week-head.is-quiet:focus-visible { outline: none; } /* batch11: программный фокус после касания — без кольца */
+.week-head b { font-size: var(--text); font-weight: 650; }
+.week-day.is-cursor .week-head b { text-decoration: underline; text-underline-offset: 3px; }
+.week-chips { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 6px; pointer-events: none; }
+.week-chip, .week-more { pointer-events: auto; max-width: 100%; padding: .36em .7em; border-radius: 1em; background: var(--field); font-size: calc(var(--text) * .74); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: pan-y; }
+.week-chip b { font-weight: 650; font-variant-numeric: tabular-nums; }
+.week-chip.is-done { color: var(--muted); text-decoration: line-through; }
+.week-chip.is-lifted { position: fixed; z-index: 70; pointer-events: none; box-shadow: 0 8px 24px rgba(0, 0, 0, .2); }
+.week-more { color: var(--muted); background: transparent; }
+.week-add { position: absolute; inset: 0; border: 0; background: transparent; border-radius: 12px; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: var(--dur-3); }

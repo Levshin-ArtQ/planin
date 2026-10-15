@@ -1,4 +1,4 @@
-const CACHE = "listok-v1.0.22";
+const CACHE = "listok-v1.0.186";
 const ASSETS = [
   "./",
   "./index.html",
@@ -6,12 +6,21 @@ const ASSETS = [
   "./css/styles.css",
   "./js/day.js",
   "./js/parse.js",
+  "./js/suggest.js",
   "./js/db.js",
   "./js/motion.js",
+  "./js/gesture.js",
+  "./js/boot.js",
+  "./js/snap.js",
   "./js/app.js",
   "./icons/icon-192.svg",
   "./icons/icon-512.svg",
-  "./icons/icon-maskable.svg"
+  "./icons/icon-maskable.svg",
+  "./icons/apple-touch-icon.png",
+  "./icons/icon-192.png",
+  "./icons/icon-512.png",
+  "./icons/icon-maskable-512.png",
+  "./icons/favicon-32.png"
 ];
 
 function isNav(req) {
@@ -83,8 +92,22 @@ function offlineShell() {
   );
 }
 
+// Новая версия ждёт подтверждения страницы (Q-16): безусловный skipWaiting оставлял
+// открытую вкладку на старом JS под новым SW с уже удалённым кэшем.
 self.addEventListener("install", (event) => {
-  event.waitUntil(precache().then(() => self.skipWaiting()));
+  event.waitUntil(precache());
+});
+
+self.addEventListener("message", (event) => {
+  const data = event.data || {};
+  if (data.type !== "SKIP_WAITING") return;
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
+      // Одна вкладка — обновляемся. Несколько — только по явной просьбе, иначе вкладки разойдутся.
+      // skipWaiting не возвращаем в waitUntil: активация ждёт конца этого события — взаимная блокировка.
+      if (list.length <= 1 || data.force) self.skipWaiting();
+    })
+  );
 });
 
 self.addEventListener("activate", (event) => {
