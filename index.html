@@ -2,8 +2,11 @@
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
-    <meta name="theme-color" content="#f3f0e8" />
+    <!-- R-18: цвет рамки по теме без JS (до загрузки скрипта тоже верный). -->
+    <meta name="theme-color" content="#f3f0e8" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#141311" media="(prefers-color-scheme: dark)" />
     <meta name="referrer" content="no-referrer" />
     <meta name="robots" content="noindex" />
     <meta name="description" content="Planin. Личный день на этом устройстве." />
@@ -12,8 +15,33 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Planin" />
     <link rel="manifest" href="manifest.json" />
-    <link rel="icon" href="icons/icon-192.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="icons/icon-192.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
+    <link rel="icon" type="image/svg+xml" href="icons/icon-192.svg" />
+    <!-- splash:start R-24: заставки iOS по теме, генерирует scripts/icons.js -->
+    <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" href="splash/750x1334-light.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" href="splash/750x1334-dark.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" href="splash/1125x2436-light.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" href="splash/1125x2436-dark.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" href="splash/828x1792-light.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" href="splash/828x1792-dark.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" href="splash/1242x2688-light.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" href="splash/1242x2688-dark.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" href="splash/1170x2532-light.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" href="splash/1170x2532-dark.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" href="splash/1284x2778-light.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" href="splash/1284x2778-dark.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" href="splash/1179x2556-light.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" href="splash/1179x2556-dark.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" href="splash/1290x2796-light.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" href="splash/1290x2796-dark.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" href="splash/1206x2622-light.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" href="splash/1206x2622-dark.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" href="splash/1320x2868-light.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" href="splash/1320x2868-dark.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 420px) and (device-height: 912px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" href="splash/1260x2736-light.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 420px) and (device-height: 912px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" href="splash/1260x2736-dark.png" />
+    <!-- splash:end -->
     <title>Planin</title>
     <style>
       html, body { margin: 0; background: #f3f0e8; color: #1c1916; }
@@ -22,27 +50,21 @@
       }
     </style>
     <link rel="stylesheet" href="css/styles.css" />
-    <script>
-      if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
-        var reloaded = false;
-        navigator.serviceWorker.addEventListener("controllerchange", function () {
-          if (reloaded) return;
-          reloaded = true;
-          location.reload();
-        });
-        navigator.serviceWorker.register("./sw.js").catch(function () {});
-      }
-    </script>
+    <script src="js/boot.js"></script>
   </head>
   <body>
     <div class="app" id="app">
       <div class="boot">Открываю Planin…</div>
     </div>
-    <input id="import-file" class="sr-file" type="file" accept="application/json,.json" />
+    <!-- R-37: снимок дня и строка ввода с первого кадра (до загрузки остального). -->
+    <script src="js/snap.js"></script>
+    <input id="import-file" class="sr-file" type="file" accept="application/json,.json" tabindex="-1" aria-hidden="true" />
     <script src="js/day.js"></script>
     <script src="js/parse.js"></script>
+    <script src="js/suggest.js"></script>
     <script src="js/db.js"></script>
     <script src="js/motion.js"></script>
+    <script src="js/gesture.js"></script>
     <script src="js/app.js"></script>
   </body>
 </html>

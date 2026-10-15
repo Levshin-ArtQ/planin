@@ -9,8 +9,13 @@
     "января", "февраля", "марта", "апреля", "мая", "июня",
     "июля", "августа", "сентября", "октября", "ноября", "декабря"
   ];
-  const ANCHOR_MIN = { morning: 9 * 60, day: 14 * 60, evening: 21 * 60, night: 22 * 60 };
-  const HOUR = 48;
+  const ANCHOR_MIN = { morning: 9 * 60, day: 15 * 60, evening: 21 * 60, night: 22 * 60 };
+  // R-23: высота часа на ленте — из CSS (--hour растёт с текстом), по умолчанию 48 px.
+  let HOUR = 48;
+  function setHour(px) {
+    if (Number.isFinite(px) && px >= 40 && px <= 120) HOUR = Math.round(px);
+    return HOUR;
+  }
 
   function pad(n) {
     return String(n).padStart(2, "0");
@@ -104,8 +109,10 @@
     m = raw.match(/^(.+?)\s*-\s*(.+)$/);
     if (m) {
       const start = parseClockText(m[1]);
-      let end = parseClockText(m[2]);
+      let end = /^24(?::00)?$/.test(m[2].trim()) ? 24 * 60 : parseClockText(m[2]); // «22–24»: до полуночи
       if (start == null || end == null) return { ok: false };
+      const raw2 = end;
+      if (end <= start) end = nightEnd(start, raw2); // через полночь (до 12:00, не дольше 14 ч): «20–9» — ночь
       if (end <= start && end < 12 * 60) end += 12 * 60;
       if (end <= start) return { ok: false };
       return { ok: true, empty: false, kind: "window", startMin: start, endMin: end };
@@ -115,9 +122,37 @@
     return { ok: true, empty: false, kind: "slot", startMin: one, endMin: null };
   }
 
+  // Окно через полночь: конец хранится как 24:00 + N, не дальше 12:00 следующих суток (36:00),
+  // и такое окно длится не больше 14 ч (UX, Q-27). Окно в пределах суток — любой длины.
+  const NIGHT_END_MAX = 36 * 60;
+  const NIGHT_LEN_MAX = 14 * 60;
+  // batch10 P2-5: начало с 13:00 записано по 24-часовым часам — конец меньше начала читается буквально,
+  // через полночь («с 17 до 7» → 17–7), без +12. «с 12 до 2» — по-прежнему обед 12–14.
+  const NIGHT_START_MIN = 13 * 60;
+  const NIGHT_MIN_DAY = 60; // Q-32: дневное окно с концом 1–5 (+12) — не короче часа
+  function nightEnd(start, end, spoken) {
+    if (end > start || start < NIGHT_START_MIN) return end;
+    const next = end + 24 * 60;
+    // Q-32 (UX): конец — голый час 1–5 (можно с минутами). Сначала тот же день +12: если окно
+    // не короче часа — дневное («с 16 до 5» → 16–17, «с 14 до 3:30» → 14–15:30); иначе через полночь,
+    // если ≤ 14 ч («с 17 до 5», «с 14:30 до 3» — ночь); иначе не окно. Конец с «утра/ночи» (spoken) — не голый час.
+    if (!spoken && end >= 60 && end < 6 * 60) {
+      const day = end + 12 * 60;
+      if (day - start >= NIGHT_MIN_DAY) return day;
+      return next - start <= NIGHT_LEN_MAX ? next : end;
+    }
+    return next <= NIGHT_END_MAX && next - start <= NIGHT_LEN_MAX ? next : end;
+  }
+  function windowEndOk(start, end) {
+    if (!Number.isInteger(end) || end < 0 || end > NIGHT_END_MAX) return false;
+    if (start == null) return end <= 24 * 60;
+    return end > start && (end <= 24 * 60 || end - start <= NIGHT_LEN_MAX);
+  }
+
   function clockLabel(min, opts) {
     if (min == null || Number.isNaN(min)) return "";
-    const h = Math.floor(min / 60);
+    // Конец окна через полночь хранится как 24:00 + N: показываем часы следующих суток (25:00 → 1:00).
+    const h = min > 24 * 60 ? Math.floor(min / 60) - 24 : Math.floor(min / 60);
     const m = min % 60;
     if (opts && opts.short && m === 0) return String(h);
     return `${h}:${pad(m)}`;
@@ -144,6 +179,21 @@
       month: MONTHS[dt.getMonth()],
       short: WD_SHORT[dt.getDay()]
     };
+  }
+
+  // batch11 (макет 04): номер недели по ISO 8601 (неделя с понедельника; первая — с первым четвергом года).
+  function isoWeek(key) {
+    const thu = addDays(key, 3 - ((dow(key) + 6) % 7));
+    const jan1 = `${thu.slice(0, 4)}-01-01`;
+    return 1 + Math.floor(diffDays(jan1, thu) / 7);
+  }
+
+  // R-31: подпись прошлого дня — день недели до 6 дней назад, старше — дата («1 сен»).
+  const MONTHS_SHORT = ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
+  function dayTag(key, today) {
+    const dt = parseKey(key);
+    if (diffDays(key, today) > 6) return `${dt.getDate()} ${MONTHS_SHORT[dt.getMonth()]}`;
+    return WD_SHORT[dt.getDay()];
   }
 
   function moveLabel(fromKey, days) {
@@ -181,7 +231,7 @@
 
   function spanOf(item) {
     const start = item.startMin != null ? item.startMin : item.endMin != null ? Math.max(0, item.endMin - 60) : 0;
-    const end = item.endMin != null ? item.endMin : item.startMin != null ? item.startMin + 30 : start + 30;
+    const end = item.endMin != null ? Math.min(item.endMin, 24 * 60) : item.startMin != null ? item.startMin + 30 : start + 30;
     return { start, end: Math.max(end, start + 15) };
   }
 
@@ -328,6 +378,26 @@
     return order && item.from > day;
   }
 
+  // R-32: что идёт сейчас и что дальше на этом дне. Идёт — окно с началом и концом, now внутри;
+  // из нескольких — то, что кончается раньше. Дальше — ближайшее открытое дело со временем начала > now.
+  const SLOT_LIVE = 15;
+  function nowLine(tasks, day, nowMin) {
+    const open = (tasks || []).filter((t) => t && t.date === day && !t.done && (t.kind === "window" || t.kind === "slot") && t.startMin != null);
+    const cur = open
+      .filter((t) => t.kind === "window" && t.endMin != null && t.startMin <= nowMin && nowMin < t.endMin)
+      .sort((a, b) => a.endMin - b.endMin || a.startMin - b.startMin)[0]
+      // batch6 P3: час без конца, который уже начался, «идёт» ещё ~15 минут.
+      || open
+        .filter((t) => t.kind === "slot" && t.startMin <= nowMin && nowMin < t.startMin + SLOT_LIVE)
+        .sort((a, b) => b.startMin - a.startMin)[0]
+      || null;
+    const next = open
+      .filter((t) => t !== cur && t.startMin > nowMin)
+      .sort((a, b) => a.startMin - b.startMin || (a.order || 0) - (b.order || 0))[0] || null;
+    if (!cur && !next) return null;
+    return { cur, next, inMin: next ? next.startMin - nowMin : null };
+  }
+
   function errandsFor(errands, day) {
     const list = (errands || [])
       .filter((e) => !errandWaits(e, day))
@@ -346,7 +416,9 @@
       seenLegend: false,
       doneStyle: "both",
       shopOpen: false,
-      textSize: "m"
+      textSize: "auto",
+      tailDays: 14,
+      autoCarry: false
     };
   }
 
@@ -354,8 +426,16 @@
     WD,
     WD_SHORT,
     MONTHS,
-    HOUR,
+    MONTHS_SHORT,
+    isoWeek,
+    get HOUR() { return HOUR; },
+    setHour,
     ANCHOR_MIN,
+    NIGHT_END_MAX,
+    NIGHT_LEN_MAX,
+    nightEnd,
+    NIGHT_START_MIN,
+    windowEndOk,
     dayKey,
     todayKey,
     parseKey,
@@ -371,6 +451,7 @@
     clockLabel,
     rangeLabel,
     head,
+    dayTag,
     moveLabel,
     workOn,
     railMode,
@@ -386,6 +467,7 @@
     habitMeta,
     errandWaits,
     errandsFor,
+    nowLine,
     defaultSettings
   };
 })(typeof window !== "undefined" ? window : globalThis);
